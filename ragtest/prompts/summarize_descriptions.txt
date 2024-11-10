@@ -1,0 +1,22 @@
+# Copyright (c) 2024 Microsoft Corporation.
+# Licensed under the MIT License
+
+"""A file containing prompts definition."""
+
+SUMMARIZE_PROMPT = """
+You are a knowledgeable assistant tasked with generating a profound, philosophical summary of the data provided below, inspired by the themes of the *Bhagavad Gita*.
+Given one or two entities and a list of descriptions, all related to the same entity or group of entities, your goal is to synthesize these descriptions into a single, insightful summary that captures both the literal and symbolic meanings.
+
+In your summary:
+- Reflect on the philosophical, spiritual, or moral implications of the entities and relationships.
+- Resolve any contradictions thoughtfully, favoring interpretations that align with the teachings and principles found within the *Bhagavad Gita*.
+- Ensure the summary maintains a coherent narrative, written in third person, and includes the entity names to provide full context.
+- If relevant, emphasize concepts such as duty, virtue, the self, and the soul, interpreting the descriptions in a way that highlights deeper spiritual significance.
+
+#######
+-Data-
+Entities: {entity_name}
+Description List: {description_list}
+#######
+Output:
+"""

@@ -1,0 +1,59 @@
+# Copyright (c) 2024 Microsoft Corporation.
+# Licensed under the MIT License
+
+"""A file containing prompts definition."""
+
+CLAIM_EXTRACTION_PROMPT = """
+-Target activity-
+You are an insightful assistant that helps a human analyst to analyze philosophical or interpretive claims presented in texts inspired by the *Bhagavad Gita*.
+
+-Goal-
+Given a text document that is potentially relevant to this activity and a claim description, extract all entities related to philosophical or symbolic themes in the *Bhagavad Gita*, such as deities, virtues, duties, mindsets, emotions, actions, and teachings. These claims may convey moral or symbolic statements, values, or teachings rooted in the *Bhagavad Gita*'s philosophical context.
+
+-Steps-
+1. Extract all named entities that align with the following philosophical or symbolic themes: **DEITY, PERSON, CONCEPT, VIRTUE, EMOTION, MINDSET, ACTION, TEACHING**. Use your understanding to identify any additional entity types that may be relevant based on the text’s philosophical context.
+2. For each entity identified in step 1, extract all claims associated with the entity. Claims should align with the specified claim description and focus on the entity as the subject of a moral, philosophical, or interpretive assertion.
+For each claim, extract the following information:
+- Subject: name of the entity that is the subject of the claim, capitalized. The subject entity represents the philosophical or moral agent in the claim.
+- Object: name of the entity that is the object of the claim, capitalized. The object entity is one that either reports/handles or is affected by the action or principle described in the claim. If object entity is unknown, use **NONE**.
+- Claim Type: overall category of the claim, capitalized. Name it in a way that reflects philosophical themes, such as **VIRTUE**, **DUTY**, **SELF-REALIZATION**, **KARMA**, etc.
+- Claim Status: **TRUE**, **FALSE**, or **SUSPECTED**. TRUE means the claim is affirmed as aligned with *Bhagavad Gita* teachings, FALSE means the claim is contradictory to *Bhagavad Gita* principles, and SUSPECTED indicates the claim’s alignment is uncertain or interpretative.
+- Claim Description: Comprehensive description explaining the claim’s moral, symbolic, or spiritual significance, including any relevant interpretations or teachings.
+- Claim Date: Period (start_date, end_date) when the claim was made or noted. Both start_date and end_date should be in ISO-8601 format. If the claim was made on a single date rather than a date range, set the same date for both start_date and end_date. If date is unknown, return **NONE**.
+- Claim Source Text: List of **all** quotes from the original text that provide relevant context to the claim.
+
+Format each claim as (<subject_entity>{tuple_delimiter}<object_entity>{tuple_delimiter}<claim_type>{tuple_delimiter}<claim_status>{tuple_delimiter}<claim_start_date>{tuple_delimiter}<claim_end_date>{tuple_delimiter}<claim_description>{tuple_delimiter}<claim_source>)
+
+3. Return output in English as a single list of all the claims identified in steps 1 and 2. Use **{record_delimiter}** as the list delimiter.
+
+4. When finished, output {completion_delimiter}
+
+-Examples-
+Example 1:
+Entity specification: DEITY, CONCEPT
+Claim description: moral or symbolic teachings associated with entities
+Text: Krishna teaches Arjuna about the importance of selflessness and performing one's duty without attachment to results.
+Output:
+
+(KRISHNA{tuple_delimiter}ARJUNA{tuple_delimiter}DUTY{tuple_delimiter}TRUE{tuple_delimiter}NONE{tuple_delimiter}NONE{tuple_delimiter}Krishna teaches Arjuna about the principle of performing one's duty without attachment, which aligns with teachings on selflessness{tuple_delimiter}Krishna teaches Arjuna about the importance of selflessness and performing one's duty without attachment to results.)
+{completion_delimiter}
+
+Example 2:
+Entity specification: PERSON, CONCEPT
+Claim description: reflections on moral or ethical conflicts
+Text: Arjuna feels deep conflict, torn between his duty as a warrior and his compassion for his kin on the battlefield.
+Output:
+
+(ARJUNA{tuple_delimiter}NONE{tuple_delimiter}DUTY-CONFLICT{tuple_delimiter}SUSPECTED{tuple_delimiter}NONE{tuple_delimiter}NONE{tuple_delimiter}Arjuna experiences moral conflict between his duty as a warrior and his compassion for family members, representing a central ethical tension in the *Bhagavad Gita*{tuple_delimiter}Arjuna feels deep conflict, torn between his duty as a warrior and his compassion for his kin on the battlefield.)
+{completion_delimiter}
+
+-Real Data-
+Use the following input for your answer.
+Entity specification: DEITY, PERSON, CONCEPT, VIRTUE, EMOTION, MINDSET, ACTION, TEACHING
+Claim description: {claim_description}
+Text: {input_text}
+Output:
+"""
+
+CONTINUE_PROMPT = "Some claims may have been missed in the last extraction. Add any remaining claims below using the same format:\n"
+LOOP_PROMPT = "It appears some claims may still need to be added. Answer YES {tuple_delimiter} NO if additional claims need to be extracted.\n"

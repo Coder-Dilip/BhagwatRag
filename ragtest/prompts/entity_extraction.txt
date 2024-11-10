@@ -1,0 +1,75 @@
+# Copyright (c) 2024 Microsoft Corporation.
+# Licensed under the MIT License
+
+"""A file containing prompts definition."""
+
+GRAPH_EXTRACTION_PROMPT = """
+-Goal-
+The text provided is from or inspired by the *Bhagavad Gita*, an ancient Indian scripture that conveys deep philosophical teachings, dialogues, and symbolic references. Your task is to extract meaningful entities and relationships within this text that capture the philosophical essence, symbolic meaning, and relational depth.
+
+Entities should reflect the spiritual, moral, and existential themes present in the *Bhagavad Gita*. Common types of entities include, but are not limited to, concepts such as duty, virtue, emotions, deities, teachings, and mindsets. You may also identify any other types that align with the philosophical or symbolic themes of the text. Use your understanding to label entities with appropriate types based on their roles or meanings within the context of the text.
+
+-Steps-
+1. Identify all entities. For each identified entity, extract the following information:
+- entity_name: Name of the entity, capitalized
+- entity_type: Based on the philosophical or symbolic role, choose an appropriate type (e.g., DEITY, PERSON, CONCEPT, VIRTUE, EMOTION, MINDSET, ACTION, TEACHING, or another relevant type that fits the context of the *Bhagavad Gita*).
+- entity_description: Detailed description of the entity’s attributes, symbolism, and philosophical implications. Include interpretations where relevant.
+Format each entity as ("entity"{tuple_delimiter}<entity_name>{tuple_delimiter}<entity_type>{tuple_delimiter}<entity_description>)
+
+2. From the entities identified in step 1, identify all pairs of (source_entity, target_entity) that are *clearly related* to each other in a philosophical or symbolic way.
+For each pair of related entities, extract the following information:
+- source_entity: name of the source entity, as identified in step 1
+- target_entity: name of the target entity, as identified in step 1
+- relationship_description: Explanation of how the source and target entities are philosophically or symbolically related, including causal, representational, or contrastive meanings where applicable.
+- relationship_strength: A numeric score indicating the philosophical significance of the relationship between the entities, where 10 represents a foundational relationship, 5-9 an important symbolic or causal link, and 1-4 a minor or interpretative connection.
+Format each relationship as ("relationship"{tuple_delimiter}<source_entity>{tuple_delimiter}<target_entity>{tuple_delimiter}<relationship_description>{tuple_delimiter}<relationship_strength>)
+
+3. Return output in English as a single list of all the entities and relationships identified in steps 1 and 2. Use **{record_delimiter}** as the list delimiter.
+
+4. When finished, output {completion_delimiter}
+
+######################
+-Examples-
+######################
+Example 1:
+Text:
+Krishna, the supreme deity, guides Arjuna on the battlefield of Kurukshetra. He explains the nature of duty, selflessness, and the eternal soul.
+######################
+Output:
+("entity"{tuple_delimiter}KRISHNA{tuple_delimiter}DEITY{tuple_delimiter}Krishna is the supreme deity who provides wisdom and guidance)
+{record_delimiter}
+("entity"{tuple_delimiter}ARJUNA{tuple_delimiter}PERSON{tuple_delimiter}A warrior seeking guidance on duty and life)
+{record_delimiter}
+("entity"{tuple_delimiter}DUTY{tuple_delimiter}CONCEPT{tuple_delimiter}The principle of fulfilling one's responsibilities without attachment to outcomes)
+{record_delimiter}
+("relationship"{tuple_delimiter}KRISHNA{tuple_delimiter}ARJUNA{tuple_delimiter}Krishna guides Arjuna in understanding his duty{tuple_delimiter}10)
+{record_delimiter}
+("relationship"{tuple_delimiter}KRISHNA{tuple_delimiter}DUTY{tuple_delimiter}Krishna imparts the concept of duty as essential for spiritual growth{tuple_delimiter}9)
+{completion_delimiter}
+
+######################
+Example 2:
+Text:
+Arjuna experiences intense inner conflict, torn between his warrior duty and his compassion for family members on the opposing side.
+######################
+Output:
+("entity"{tuple_delimiter}ARJUNA{tuple_delimiter}PERSON{tuple_delimiter}Arjuna is a warrior experiencing moral and emotional conflict)
+{record_delimiter}
+("entity"{tuple_delimiter}DUTY{tuple_delimiter}CONCEPT{tuple_delimiter}The concept of duty as Arjuna’s responsibility as a warrior)
+{record_delimiter}
+("entity"{tuple_delimiter}COMPASSION{tuple_delimiter}VIRTUE{tuple_delimiter}A virtue that causes Arjuna emotional turmoil on the battlefield)
+{record_delimiter}
+("relationship"{tuple_delimiter}DUTY{tuple_delimiter}COMPASSION{tuple_delimiter}Duty and compassion create an inner conflict within Arjuna{tuple_delimiter}8)
+{completion_delimiter}
+
+######################
+-Real Data-
+######################
+Entity_types: DEITY, PERSON, CONCEPT, VIRTUE, EMOTION, MINDSET, ACTION, TEACHING
+Text: {input_text}
+######################
+Output:
+"""
+
+CONTINUE_PROMPT = "Add any remaining concepts, symbols, or entities that further clarify the philosophical and symbolic relationships within the text.\n"
+LOOP_PROMPT = "Are there additional entities or relationships that might add depth or uncover further philosophical insights in this passage? Answer YES | NO.\n"
